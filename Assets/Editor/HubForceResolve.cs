@@ -5,7 +5,7 @@
 
       [InitializeOnLoad]
       public static class HubForceResolve
-      {
+        {
           private const string k_ScriptPath = "Assets\\Editor\\HubForceResolve.cs";
           private const string k_EditorFolderPath = "Assets\\Editor";
           private const string k_StateKey = "Hub.ForceResolve.State";
@@ -35,7 +35,7 @@
 
               // Resolved and idle again → remove the script.
               Cleanup();
-          }
+        }
 
           static void Cleanup()
           {
@@ -73,4 +73,5 @@
                   AssetDatabase.DeleteAsset(k_EditorFolderPath);
               }
           }
-      }
+        }
+        
