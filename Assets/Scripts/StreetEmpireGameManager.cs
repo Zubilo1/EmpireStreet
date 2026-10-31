@@ -8,7 +8,7 @@ public class StreetEmpireGameManager : MonoBehaviour
     public Transform player;
     float crimeCooldown;
     void Awake() { Instance = this; Money = PlayerPrefs.GetInt("SE_Money", 500); }
-    void Update() { crimeCooldown -= Time.deltaTime; if (Input.GetKeyDown(KeyCode.G)) CommitCrime(); if (Input.GetKeyDown(KeyCode.M)) ChangeMoney(100); }
+    void Update() { crimeCooldown -= Time.deltaTime; if (Input.GetKeyDown(KeyCode.G)) CommitCrime(); if (Input.GetKeyDown(KeyCode.G)) ChangeMoney(Random.Range(20, 151)); }
     public void CommitCrime() { if (crimeCooldown > 0) return; crimeCooldown = 2f; SetWanted(Mathf.Min(5, WantedLevel + 1)); }
     public void SetWanted(int value) { WantedLevel = Mathf.Clamp(value, 0, 5); }
     public void ChangeMoney(int amount) { Money = Mathf.Max(0, Money + amount); PlayerPrefs.SetInt("SE_Money", Money); PlayerPrefs.Save(); }
