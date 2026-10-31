@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class StreetEmpirePolice : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class StreetEmpirePolice : MonoBehaviour
         Vector3 delta = target.position - transform.position; delta.y = 0;
         if (delta.magnitude > activateDistance) return;
         if (delta.sqrMagnitude > 2f) { transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(delta), 2.5f * Time.deltaTime); transform.position += transform.forward * chaseSpeed * Time.deltaTime; }
+    
         if (delta.magnitude < 2.2f) { gm.SetWanted(0); gm.ChangeMoney(-100); transform.position += Random.insideUnitSphere * 30f; transform.position = new Vector3(transform.position.x, 0, transform.position.z); }
     }
+
 }
