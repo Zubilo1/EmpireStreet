@@ -5,10 +5,13 @@ public class CrimeSystem : MonoBehaviour
 {
     public static CrimeSystem I;
 
-    [Header("Настройки свидетелей")]
+    [Header("РќР°СЃС‚СЂРѕР№РєРё СЃРІРёРґРµС‚РµР»РµР№")]
     public float witnessRange = 15f;
     public float reportDelay = 3f;
-    [Range(0f, 1f)] public float reportChance = 0.8f;
+
+    [Range(0f, 1f)]
+    public float reportChance = 0.8f;
+
     public LayerMask obstacleMask = ~0;
 
     void Awake()
@@ -26,29 +29,61 @@ public class CrimeSystem : MonoBehaviour
     {
         if (!suspect) return;
 
-        CitizenAI[] citizens = FindObjectsByType<CitizenAI>();
+        CitizenAI[] citizens =
+            FindObjectsByType<CitizenAI>();
 
         foreach (CitizenAI citizen in citizens)
         {
-            if (!citizen || citizen.transform == suspect) continue;
+            if (!citizen || citizen.transform == suspect)
+                continue;
 
-            Vector3 offset = suspect.position - citizen.transform.position;
-            if (offset.magnitude > witnessRange) continue;
+            Vector3 offset =
+                suspect.position - citizen.transform.position;
 
-            Vector3 eye = citizen.transform.position + Vector3.up * 1.5f;
-            Vector3 target = suspect.position + Vector3.up;
+            if (offset.magnitude > witnessRange)
+                continue;
+
+            Vector3 eye =
+                citizen.transform.position + Vector3.up * 1.5f;
+
+            Vector3 target =
+                suspect.position + Vector3.up;
 
             Vector3 direction = target - eye;
             float distance = direction.magnitude;
 
-            if (distance <= 0f) continue;
-
-            // Препятствия блокируют обзор.
-            if (Physics.Raycast(eye, direction.normalized,
-                distance, obstacleMask, QueryTriggerInteraction.Ignore))
+            if (distance <= 0f)
                 continue;
 
-            if (Random.value > reportChance) continue;
+            RaycastHit[] hits = Physics.RaycastAll(
+                eye,
+                direction.normalized,
+                distance,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore
+            );
+
+            bool blocked = false;
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.transform == citizen.transform ||
+                    hit.transform.IsChildOf(citizen.transform))
+                    continue;
+
+                if (hit.transform == suspect ||
+                    hit.transform.IsChildOf(suspect))
+                    continue;
+
+                blocked = true;
+                break;
+            }
+
+            if (blocked)
+                continue;
+
+            if (Random.value > reportChance)
+                continue;
 
             citizen.WitnessCrime(reportDelay);
         }

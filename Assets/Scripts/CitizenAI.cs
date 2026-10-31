@@ -30,16 +30,23 @@ public class CitizenAI : MonoBehaviour
         if (timer >= wanderTimer)
         {
             Vector3 newPos = RandomNavSphere(
-                transform.position, wanderRadius, NavMesh.AllAreas);
+                transform.position,
+                wanderRadius,
+                NavMesh.AllAreas
+            );
 
-            agent.SetDestination(newPos);
+            if ((newPos - transform.position).sqrMagnitude > 1f)
+                agent.SetDestination(newPos);
+
             timer = 0f;
         }
     }
 
     public void WitnessCrime(float delay)
     {
-        if (hasReported) return;
+        if (hasReported)
+            return;
+
         StartCoroutine(ReportAfterDelay(delay));
     }
 
@@ -47,27 +54,36 @@ public class CitizenAI : MonoBehaviour
     {
         hasReported = true;
 
-        // Свидетель заметил преступление и сообщает не мгновенно.
         yield return new WaitForSeconds(delay);
 
         if (GameManager.I != null)
         {
             GameManager.I.AddWanted(1);
-            GameManager.I.Notice = "Свидетель сообщил полиции!";
+            GameManager.I.Notice =
+                "Свидетель сообщил полиции!";
         }
     }
 
     public static Vector3 RandomNavSphere(
-        Vector3 origin, float dist, int layermask)
+        Vector3 origin,
+        float dist,
+        int layermask)
     {
-        Vector3 randomDirection = Random.insideUnitSphere * dist;
+        Vector3 randomDirection =
+            Random.insideUnitSphere * dist;
+
         randomDirection += origin;
 
         NavMeshHit hit;
 
         if (NavMesh.SamplePosition(
-            randomDirection, out hit, dist, layermask))
+            randomDirection,
+            out hit,
+            dist,
+            layermask))
+        {
             return hit.position;
+        }
 
         return origin;
     }
