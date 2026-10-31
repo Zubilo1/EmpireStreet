@@ -5,12 +5,17 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager I;
 
+    [Header("Игрок")]
     public int Cash = 250;
     public int WantedLevel = 0;
     public int Skill = 1;
     public int InventoryItems = 0;
+
+    [Header("Недвижимость")]
     public bool OwnsApartment = false;
     public bool OwnsBusiness = false;
+
+    [Header("Уведомления")]
     public string Notice = "Добро пожаловать в Street Empire";
 
     float incomeTimer;
@@ -82,19 +87,31 @@ public class GameManager : MonoBehaviour
         GUI.Box(new Rect(12, 12, 245, 135), "");
         GUI.Label(new Rect(24, 20, 220, 24), "STREET EMPIRE");
         GUI.Label(new Rect(24, 44, 220, 20), "Наличные: " + Cash + "$");
-        GUI.Label(new Rect(24, 64, 220, 20),
-            "Розыск: " + new string('*', WantedLevel)
-            + new string('-', 5 - WantedLevel));
-        GUI.Label(new Rect(24, 84, 220, 20),
-            "Навык: " + Skill + "   Инвентарь: " + InventoryItems);
+
+        GUI.Label(
+            new Rect(24, 64, 220, 20),
+            "Розыск: " + new string('*', WantedLevel) +
+            new string('-', 5 - WantedLevel)
+        );
+
+        GUI.Label(
+            new Rect(24, 84, 220, 20),
+            "Навык: " + Skill + "   Инвентарь: " + InventoryItems
+        );
 
         if (OwnsApartment)
             GUI.Label(new Rect(24, 104, 220, 20), "Квартира куплена");
 
         if (OwnsBusiness)
-            GUI.Label(new Rect(24, 124, 220, 20), "Бизнес куплен (+40$ / 10 сек)");
+            GUI.Label(
+                new Rect(24, 124, 220, 20),
+                "Бизнес куплен (+40$ / 10 сек)"
+            );
 
-        GUI.Label(new Rect(12, Screen.height - 42,
-            Screen.width - 24, 30), Notice);
+        GUI.Label(
+            new Rect(12, Screen.height - 42,
+            Screen.width - 24, 30),
+            Notice
+        );
     }
 }
