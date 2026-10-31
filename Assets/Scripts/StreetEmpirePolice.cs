@@ -1,19 +1,111 @@
-using UnityEngine;
-using UnityEngine.Audio;
 
+using UnityEngine;
+
+[RequireComponent(typeof(AudioSource))]
 public class StreetEmpirePolice : MonoBehaviour
 {
-    public Transform target; public float chaseSpeed = 7f; public float activateDistance = 45f;
-    void Update()
+    [Header("Полиция")]
+    public Transform target;
+    public float chaseSpeed = 7f;
+    public float activateDistance = 45f;
+
+    [Header("Сирена")]
+    public AudioSource sirenAudio;
+
+    bool sirenActive;
+
+    void Start()
     {
-        if (!target) return;
-        var gm = StreetEmpireGameManager.Instance;
-        if (gm == null || gm.WantedLevel <= 0) return;
-        Vector3 delta = target.position - transform.position; delta.y = 0;
-        if (delta.magnitude > activateDistance) return;
-        if (delta.sqrMagnitude > 2f) { transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(delta), 2.5f * Time.deltaTime); transform.position += transform.forward * chaseSpeed * Time.deltaTime; }
-    
-        if (delta.magnitude < 2.2f) { gm.SetWanted(0); gm.ChangeMoney(-100); transform.position += Random.insideUnitSphere * 30f; transform.position = new Vector3(transform.position.x, 0, transform.position.z); }
+        if (sirenAudio == null)
+            sirenAudio = GetComponent<AudioSource>();
+
+        if (sirenAudio != null)
+        {
+            sirenAudio.playOnAwake = false;
+            sirenAudio.loop = true;
+            sirenAudio.Stop();
+        }
     }
 
+    void Update()
+    {
+        var gm = StreetEmpireGameManager.Instance;
+
+        if (gm == null || gm.WantedLevel <= 0)
+        {
+            StopSiren();
+            return;
+        }
+
+        // Включаем сирену при появлении розыска.
+        StartSiren();
+
+        if (target == null)
+        {
+            if (gm.player != null)
+                target = gm.player;
+
+            if (target == null)
+                return;
+        }
+
+        Vector3 delta = target.position - transform.position;
+        delta.y = 0f;
+
+        // Если игрок далеко, машина пока не преследует его.
+        if (delta.magnitude > activateDistance)
+            return;
+
+        // Преследование игрока.
+        if (delta.sqrMagnitude > 2f)
+        {
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(delta),
+                2.5f * Time.deltaTime
+            );
+
+            transform.position +=
+                transform.forward * chaseSpeed * Time.deltaTime;
+        }
+
+        // Задержание.
+        if (delta.magnitude < 2.2f)
+        {
+            gm.SetWanted(0);
+            gm.ChangeMoney(-100);
+
+            StopSiren();
+
+            Vector3 escapePosition =
+                transform.position + Random.insideUnitSphere * 30f;
+
+            escapePosition.y = transform.position.y;
+            transform.position = escapePosition;
+        }
+    }
+
+    void StartSiren()
+    {
+        if (sirenActive)
+            return;
+
+        sirenActive = true;
+
+        if (sirenAudio != null)
+            sirenAudio.Play();
+    }
+
+    void StopSiren()
+    {
+        sirenActive = false;
+
+        if (sirenAudio != null && sirenAudio.isPlaying)
+            sirenAudio.Stop();
+    }
+
+    void OnDisable()
+    {
+        StopSiren();
+    }
 }
